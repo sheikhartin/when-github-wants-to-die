@@ -27,7 +27,7 @@ Clone all the repositories and gists in a account:
 python core.py "sheikhartin"
 ```
 
-<i>Note: The script puts the repositories and gists in the current directory.</i>
+<!-- <i>Note: The script puts the repositories and gists in the current directory.</i> -->
 
 Only some special repositories:
 
@@ -41,13 +41,11 @@ Clone a specific branch:
 python core.py "openai" -r "gym@benchmark"
 ```
 
-Download gists:
+Download gists by ID:
 
 ```bash
-python core.py "roachhd" -g "dce54bec8ba55fb17d3a@README.md"
+python core.py "roachhd" -g "dce54bec8ba55fb17d3a"
 ```
-
-<i>Note: GitHub Gist is case sensitive, and you need to use the exact name of the gist.</i>
 
 Suppress the output:
 
@@ -55,7 +53,7 @@ Suppress the output:
 python core.py "google" -q
 ```
 
-<i>Note: When faced with a large number of repositories in one account, the program selects the top 100 based on the stars... UNFORTUNATELY, THE GITHUB API DOES NOT WORK WELL WITH THIS FEATURE YET!</i>
+<i>Note: When faced with a large number of repositories in one account, the program selects the top 100 based on the stars... Unfortunately, the GitHub API does not work well with this feature yet!</i>
 
 ### License
 
