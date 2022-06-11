@@ -21,11 +21,13 @@ Install the required dependencies:
 pip install -r requirements.txt
 ```
 
-Clone all the repositories in a account:
+Clone all the repositories and gists in a account:
 
 ```bash
 python core.py "sheikhartin"
 ```
+
+<i>Note: The script puts the repositories and gists in the current directory.</i>
 
 Only some special repositories:
 
@@ -38,6 +40,14 @@ Clone a specific branch:
 ```bash
 python core.py "openai" -r "gym@benchmark"
 ```
+
+Download gists:
+
+```bash
+python core.py "roachhd" -g "dce54bec8ba55fb17d3a@README.md"
+```
+
+<i>Note: GitHub Gist is case sensitive, and you need to use the exact name of the gist.</i>
 
 Suppress the output:
 
