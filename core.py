@@ -33,7 +33,7 @@ def download_all_repos(username: str) -> None:
     """Downloads all repositories from a account."""
     all_repos_metadata = _get_all_repos_metadata(username)
     for repo_name, description, default_branch in all_repos_metadata:
-        print(f'Downloading {repo_name}... {description}')
+        print(f'➤ Downloading {repo_name}... {description}')
         # print(f'Repository: {repo_name}')
         # print(f'Description: {description}')
         download_repo(username, repo_name, default_branch)
@@ -59,7 +59,7 @@ def download_all_gists(username: str) -> None:
     """Downloads all gists from a account."""
     all_gists_metadata = _get_all_gists_metadata(username)
     for gist_id, description, files in all_gists_metadata:
-        print(f'Downloading {gist_id}... {description}')
+        print(f'➤ Downloading {gist_id}... {description}')
         # print(f'Gist: {gist_id}')
         # print(f'Description: {description}')
         for filename, _ in files.items():
@@ -102,12 +102,12 @@ if __name__ == '__main__':
     if args.repositories:
         for repo in args.repositories:
             name, *branch = repo.split('@')
-            print(f'Downloading {name}...')
+            print(f'➤ Downloading {name}...')
             download_repo(args.username, name, branch[0] if branch else None)
     if args.gists:
         for gist in args.gists:
             gist_id, *filename = gist.split('@')
-            print(f'Downloading {gist_id}...')
+            print(f'➤ Downloading {gist_id}...')
             download_gist(args.username, gist_id, filename[0] if filename else None)
 
     print('All done! ;)')
