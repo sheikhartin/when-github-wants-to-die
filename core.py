@@ -1,70 +1,67 @@
 #!/usr/bin/env python
 
 import shutil
+from pathlib import Path
 from typing import Optional
 
 import requests
 import git
+from git.exc import GitCommandError
 
 
-def _get_account_info(username: str) -> Optional[dict]:
-    """Gets account info from GitHub by username."""
-    resp = requests.get(f'https://api.github.com/users/{username}')
+def _validate_account(account: str) -> Optional[dict]:
+    """Validates the account to make sure it exists."""
+    resp = requests.get(f'https://api.github.com/users/{account}')
     if resp.status_code == 200:
         return resp.json()
     return None
 
 
-def _get_all_repos_metadata(username: str) -> list:
-    """Gets all repositories metadata such as name, description and default branch."""
-    resp = requests.get(f'https://api.github.com/users/{username}/repos?per_page=100&sort=stars')  # https://docs.github.com/en/rest/search#search-repositories
-    return [(repo['name'], repo['description'], repo['default_branch']) for repo in resp.json()]
+def _build_path(*paths: str, delete_before: Optional[bool] = False) -> None:
+    """Builds the path if it doesn't exist."""
+    for path in paths:
+        if delete_before:
+            shutil.rmtree(path, ignore_errors=True)
+        Path(path).mkdir(parents=True, exist_ok=True)
+    return None  # This line keeps the balance of indentation...
 
 
-def download_repo(username: str, repo_name: str, branch: Optional[str] = None,
-                  path: Optional[str] = None) -> None:
-    """Downloads a repository from a account."""
-    shutil.rmtree(path if path is not None else repo_name, ignore_errors=True)
-    git.Repo.clone_from(f'https://github.com/{username}/{repo_name}.git',
-                        path if path is not None else repo_name, branch=branch)
+def clone_repository(account: str, repo: str, branch: Optional[str] = None) -> None:
+    """Clones the repository."""
+    _build_path(f'{account}/repos/{repo}', delete_before=True)
+    try:
+        git.Repo.clone_from(f'https://github.com/{account}/{repo}', f'{account}/repos/{repo}', branch=branch)
+    except GitCommandError:
+        print(f'Error occurred while cloning {account}/{repo}...')
+        shutil.rmtree(f'{account}/repos/{repo}', ignore_errors=True)
 
 
-def download_all_repos(username: str) -> None:
-    """Downloads all repositories from a account."""
-    all_repos_metadata = _get_all_repos_metadata(username)
-    for repo_name, description, default_branch in all_repos_metadata:
-        print(f'➤ Downloading {repo_name}... {description}')
-        # print(f'Repository: {repo_name}')
-        # print(f'Description: {description}')
-        download_repo(username, repo_name, default_branch)
-        # print()
+def clone_all_repositories(account: str) -> None:
+    """Clones all repositories for the account."""
+    resp = requests.get(f'https://api.github.com/users/{account}/repos')
+    repo_names = [repo['name'] for repo in resp.json()]
+    for repo in repo_names:
+        print(f'Cloning {account}/{repo}...')
+        clone_repository(account, repo)
 
 
-def _get_all_gists_metadata(username: str) -> list:
-    """Gets all gists metadata such as ID, description and files."""
-    resp = requests.get(f'https://api.github.com/users/{username}/gists?per_page=100')
-    return [(gist['id'], gist['description'], gist['files']) for gist in resp.json()]
+def clone_gist(account: str, gist_id: str) -> None:
+    """Clones the gist."""
+    _build_path(f'{account}/gists/{gist_id}', delete_before=True)
+    try:
+        git.Repo.clone_from(f'https://gist.github.com/{account}/{gist_id}.git', f'{account}/gists/{gist_id}')
+    except GitCommandError:
+        print(f'Error occurred while cloning {account}/{gist_id}...')
+        shutil.rmtree(f'{account}/gists/{gist_id}', ignore_errors=True)
 
 
-def download_gist(username: str, id: str, filename: str) -> None:
-    """Downloads a gist from a account."""
-    with requests.get(f'https://gist.github.com/{username}/{id}/raw/{filename}', stream=True) as r:
-        # print('Status code:', r.status_code)
-        # print('Response:', r.text)
-        with open(filename, 'w') as f:
-            f.write(r.text)
-
-
-def download_all_gists(username: str) -> None:
-    """Downloads all gists from a account."""
-    all_gists_metadata = _get_all_gists_metadata(username)
-    for gist_id, description, files in all_gists_metadata:
-        print(f'➤ Downloading {gist_id}... {description}')
-        # print(f'Gist: {gist_id}')
-        # print(f'Description: {description}')
-        for filename, _ in files.items():
-            download_gist(username, gist_id, filename)
-        # print()
+def clone_all_gists(account: str) -> None:
+    """Clones all gists for the account."""
+    resp = requests.get(f'https://api.github.com/users/{account}/gists')
+    gist_ids = [gist['id'] for gist in resp.json()]
+    for gist_id in gist_ids:
+        print(f'Cloning {account}/{gist_id}...')
+        clone_gist(account, gist_id)
 
 
 if __name__ == '__main__':
@@ -72,42 +69,33 @@ if __name__ == '__main__':
     import sys
     import os
 
-    parser = argparse.ArgumentParser(description='Download repositories from GitHub for worrying situations.')
-    parser.add_argument('username', help='The ID of the account what could be a user or organization')
-    parser.add_argument('-r', '--repositories', nargs='+', help='The name of the repositories to download')
-    parser.add_argument('-g', '--gists', nargs='+', help='The ID of the gists and the files to download')
+    parser = argparse.ArgumentParser(description='Clone any repository and gist for a GitHub account.')
+    parser.add_argument('account', help='The GitHub account to clone from')
+    parser.add_argument('-r', '--repositories', nargs='+', help='The repositories to clone')
+    parser.add_argument('-g', '--gists', nargs='+', help='The gists to clone')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress output')
     args = parser.parse_args()
 
     if args.quiet:
         sys.stdout = open(os.devnull, 'w')
 
-    account_info = _get_account_info(args.username)
-    if account_info is None:
-        print(f'Could not find account {args.username}!')
+    if not _validate_account(args.account):
+        print(f'Account {args.account} does not exist...')
         sys.exit(1)
-    print(f'An account with ID `{args.username}` was found!')
-    print(f'Name: {account_info["name"]}')
-    print(f'Bio: {account_info["bio"] or "-"}')
-    print(f'Email: {account_info["email"] or "-"}')
-    print(f'Twitter: {account_info["twitter_username"] or "-"}')
-    print(f'Blog: {account_info["blog"] or "-"}')
-    print(f'Location: {account_info["location"] or "-"}\n')
+    print('Account exists...')
 
     if not args.repositories and not args.gists:
-        print(f'Downloading all repositories for {args.username}...')
-        download_all_repos(args.username)
-        print(f'\nDownloading all gists for {args.username}...')
-        download_all_gists(args.username)
+        print('Cloning all repositories and gists...')
+        clone_all_repositories(args.account)
+        clone_all_gists(args.account)
     if args.repositories:
         for repo in args.repositories:
-            name, *branch = repo.split('@')
-            print(f'➤ Downloading {name}...')
-            download_repo(args.username, name, branch[0] if branch else None)
+            repo, *branch = repo.split('@')
+            print(f'Cloning {args.account}/{repo} repository...')
+            clone_repository(args.account, repo, branch=branch[0] if branch else None)
     if args.gists:
-        for gist in args.gists:
-            gist_id, *filename = gist.split('@')
-            print(f'➤ Downloading {gist_id}...')
-            download_gist(args.username, gist_id, filename[0] if filename else None)
+        for gist_id in args.gists:
+            print(f'Cloning {args.account}/{gist_id} gist...')
+            clone_gist(args.account, gist_id)
 
-    print('All done! ;)')
+    print('The script has finished!')
