@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import shutil
 from typing import Optional
 
 import requests
@@ -14,15 +15,16 @@ def _get_account_info(id: str) -> Optional[dict]:
     return None
 
 
-def _get_all_repos_metadata(id: str) -> str:
+def _get_all_repos_metadata(id: str) -> list:
     """Gets all repositories metadata such as name, description, etc."""
-    resp = requests.get(f'https://api.github.com/users/{id}/repos?per_page=100&sort=stars')  # Top 100 repositories is enough
+    resp = requests.get(f'https://api.github.com/users/{id}/repos?per_page=100&sort=stars')  # https://docs.github.com/en/rest/search#search-repositories
     return [(repo['name'], repo['description'], repo['default_branch']) for repo in resp.json()]
 
 
 def download_repo(id: str, repo_name: str, branch: Optional[str] = None,
                   path: Optional[str] = None) -> None:
     """Downloads a repository from a account."""
+    shutil.rmtree(path if path is not None else repo_name, ignore_errors=True)
     git.Repo.clone_from(f'https://github.com/{id}/{repo_name}.git',
                         path if path is not None else repo_name, branch=branch)
 
@@ -56,13 +58,13 @@ if __name__ == '__main__':
     if account_info is None:
         print(f'Could not find account {args.id}!')
         sys.exit(1)
-    print(f'Account found!')
+    print(f'An account with ID `{args.id}` was found!')
     print(f'Name: {account_info["name"]}')
-    print(f'Bio: {account_info["bio"]}')
-    print(f'Email: {account_info["email"]}')
-    print(f'Twitter: {account_info["twitter_username"]}')
-    print(f'Blog: {account_info["blog"]}')
-    print(f'Location: {account_info["location"]}\n')
+    print(f'Bio: {account_info["bio"] or "-"}')
+    print(f'Email: {account_info["email"] or "-"}')
+    print(f'Twitter: {account_info["twitter_username"] or "-"}')
+    print(f'Blog: {account_info["blog"] or "-"}')
+    print(f'Location: {account_info["location"] or "-"}\n')
 
     if args.repositories:
         for repo in args.repositories:

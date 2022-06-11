@@ -45,7 +45,7 @@ Suppress the output:
 python core.py "google" -q
 ```
 
-<i>Note: When faced with a large number of repositories in one account, the program selects the top 100 based on the stars...</i>
+<i>Note: When faced with a large number of repositories in one account, the program selects the top 100 based on the stars... UNFORTUNATELY, THE GITHUB API DOES NOT WORK WELL WITH THIS FEATURE YET!</i>
 
 ### License
 
