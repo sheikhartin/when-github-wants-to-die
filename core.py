@@ -31,8 +31,9 @@ def clone_repository(account: str, repo: str, branch: Optional[str] = None) -> N
     _build_path(f'{account}/repos/{repo}', delete_before=True)
     try:
         git.Repo.clone_from(f'https://github.com/{account}/{repo}', f'{account}/repos/{repo}', branch=branch)
-    except GitCommandError:
+    except GitCommandError as e:
         print(f'Error occurred while cloning {account}/{repo}...')
+        print(f'Details: {e}')
         shutil.rmtree(f'{account}/repos/{repo}', ignore_errors=True)
 
 
@@ -49,9 +50,10 @@ def clone_gist(account: str, gist_id: str) -> None:
     """Clones the gist."""
     _build_path(f'{account}/gists/{gist_id}', delete_before=True)
     try:
-        git.Repo.clone_from(f'https://gist.github.com/{account}/{gist_id}.git', f'{account}/gists/{gist_id}')
-    except GitCommandError:
+        git.Repo.clone_from(f'https://gist.github.com/{account}/{gist_id}', f'{account}/gists/{gist_id}')
+    except GitCommandError as e:
         print(f'Error occurred while cloning {account}/{gist_id}...')
+        print(f'Details: {e}')
         shutil.rmtree(f'{account}/gists/{gist_id}', ignore_errors=True)
 
 
