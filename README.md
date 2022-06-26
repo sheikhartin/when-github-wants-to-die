@@ -15,7 +15,7 @@ Some links that may help you understand the situation:
 - [GitHub Confirms it has Blocked Developers in Iran, Syria and Crimea](https://techcrunch.com/2019/07/29/github-ban-sanctioned-countries/)
 <!-- - [GitHub vs GitLab vs Bitbucket](https://jelvix.com/blog/bitbucket-vs-github-vs-gitlab) -->
 
-![Not to the death of GitHub!](https://media.giphy.com/media/59bo7PVAiXHV59QCFG/giphy.gif)
+![Not to the death of GitHub](https://media.giphy.com/media/59bo7PVAiXHV59QCFG/giphy.gif)
 
 ### Usage
 
