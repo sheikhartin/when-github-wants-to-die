@@ -1,7 +1,9 @@
 ## When GitHub Wants to Die
 
 ![GitHub repo status](https://img.shields.io/badge/status-active-green?style=flat)
+![GitHub license](https://img.shields.io/github/license/sheikhartin/when-github-wants-to-die)
 ![GitHub contributors](https://img.shields.io/github/contributors/sheikhartin/when-github-wants-to-die)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/sheikhartin/when-github-wants-to-die)
 ![GitHub repo size](https://img.shields.io/github/repo-size/sheikhartin/when-github-wants-to-die)
 
 GitHub is a platform for collaborating on code. It's a place to share code, to discuss ideas, and to help each other. Millions of people use GitHub to build their projects, and collaborating with others.
