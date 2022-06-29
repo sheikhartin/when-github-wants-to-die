@@ -23,7 +23,6 @@ def _build_path(*paths: str, delete_before: Optional[bool] = False) -> None:
         if delete_before:
             shutil.rmtree(path, ignore_errors=True)
         Path(path).mkdir(parents=True, exist_ok=True)
-    return None  # This line keeps the balance of indentation...
 
 
 def clone_repository(account: str, repo: str, branch: Optional[str] = None) -> None:
@@ -71,11 +70,11 @@ if __name__ == '__main__':
     import sys
     import os
 
-    parser = argparse.ArgumentParser(description='Clone any repository and gist for a GitHub account.')
-    parser.add_argument('account', help='The GitHub account to clone from')
-    parser.add_argument('-r', '--repositories', nargs='+', help='The repositories to clone')
-    parser.add_argument('-g', '--gists', nargs='+', help='The gists to clone')
-    parser.add_argument('-q', '--quiet', action='store_true', help='Suppress output')
+    parser = argparse.ArgumentParser(description='Clone any or even all repositories and gists for a GitHub account.')
+    parser.add_argument('account', help='the github account to clone from')
+    parser.add_argument('-r', '--repositories', nargs='+', help='the repositories to clone')
+    parser.add_argument('-g', '--gists', nargs='+', help='the gists to clone')
+    parser.add_argument('-q', '--quiet', action='store_true', help='suppress output')
     args = parser.parse_args()
 
     if args.quiet:
